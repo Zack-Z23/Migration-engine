@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis_service
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  app:
+    build: .
+    container_name: exporter_app
+    environment:
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ${HOST_XML_MAPPING:-./config.xml}:/data/config.xml
+    command: ${APP_ARGS}
+    depends_on:
+      - redis
+
+volumes:
+  redis_data:
